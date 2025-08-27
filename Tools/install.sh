@@ -17,6 +17,7 @@ apt install -y curl htop vnstat
 systemctl stop qbittorrent-nox@$USER
 wget -O /root/BBRy.sh https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/refs/heads/main/BBR/BBRx/BBRy.sh
 chmod +x /root/BBRy.sh
+bash /root/BBRy.sh
 #systemctl disable qbittorrent-nox@$USER
 systemARCH=$(uname -m)
 if [[ $systemARCH == x86_64 ]]; then
@@ -31,9 +32,9 @@ sed -i "/\\[Preferences\\]/a General\\\\Locale=zh" /home/$USER/.config/qBittorre
 sed -i "/\\[Preferences\\]/a Downloads\\\\PreAllocation=false" /home/$USER/.config/qBittorrent/qBittorrent.conf
 sed -i "/\\[Preferences\\]/a WebUI\\\\CSRFProtection=false" /home/$USER/.config/qBittorrent/qBittorrent.conf
 sed -i "s/disable_tso_/# disable_tso_/" /root/.boot-script.sh
-echo "systemctl enable qbittorrent-nox@$USER" >> /root/BBRy.sh
-echo "systemctl start qbittorrent-nox@$USER" >> /root/BBRy.sh
+systemctl enable qbittorrent-nox@$USER
+systemctl start qbittorrent-nox@$USER
 echo "shutdown -r +1" >> /root/BBRy.sh
 tune2fs -m 1 $(df -h / | awk 'NR==2 {print $1}') 
-echo "接下来将自动重启2次，流程预计5-10分钟..."
+echo "安装完成，系统将在 1 分钟后重启以应用 BBRy TCP 加速..."
 shutdown -r +1
