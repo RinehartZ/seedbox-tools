@@ -20,9 +20,10 @@ chmod +x /root/BBRy.sh
 #systemctl disable qbittorrent-nox@$USER
 systemARCH=$(uname -m)
 if [[ $systemARCH == x86_64 ]]; then
-    wget -O /usr/bin/qbittorrent-nox https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/raw/refs/heads/main/Torrent%20Clients/qBittorrent/ARM64/qBittorrent-5.0.4%20-%20libtorrent-v1.2.20/qbittorrent-nox
-elif [[ $systemARCH == aarch64 ]]; then
     wget -O /usr/bin/qbittorrent-nox https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/raw/refs/heads/main/Torrent%20Clients/qBittorrent/x86_64/qBittorrent-5.0.4%20-%20libtorrent-v1.2.20/qbittorrent-nox
+fi
+elif [[ $systemARCH == aarch64 ]]; then
+    wget -O /usr/bin/qbittorrent-nox https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/raw/refs/heads/main/Torrent%20Clients/qBittorrent/ARM64/qBittorrent-5.0.4%20-%20libtorrent-v1.2.20/qbittorrent-nox
 fi
 chmod +x /usr/bin/qbittorrent-nox
 sed -i "s/WebUI\\\\Port=[0-9]*/WebUI\\\\Port=$PORT/" /home/$USER/.config/qBittorrent/qBittorrent.conf
