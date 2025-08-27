@@ -1,7 +1,8 @@
 #!/bin/bash
 
 if [ "$#" -lt 2 ]; then
-    echo "Usage: $0 <user> <password> <port> <qb_up_port>"
+    echo "Usage: $0 <user> <password> [<port> <qb_up_port>] [<bbr_option>]"
+    echo "bbr_option: bbrx / bbry / bbrz / none (默认 none)"
     exit 1
 fi
 
@@ -9,32 +10,66 @@ USER=$1
 PASSWORD=$2
 PORT=${3:-8080}
 UP_PORT=${4:-23333}
+BBR_OPTION=${5:-none}
+
 RAM=$(free -m | awk '/^Mem:/{print $2}')
 CACHE_SIZE=$((RAM / 8))
 
-bash <(wget -qO- https://raw.githubusercontent.com/jerry048/Dedicated-Seedbox/main/Install.sh) -u $USER -p $PASSWORD -c $CACHE_SIZE -q 4.3.9 -l v1.2.20
+bash <(wget -qO- https://raw.githubusercontent.com/jerry048/Dedicated-Seedbox/main/Install.sh) \
+    -u $USER -p $PASSWORD -c $CACHE_SIZE -q 4.3.9 -l v1.2.20
+
+apt update
 apt install -y curl htop vnstat
+
 systemctl stop qbittorrent-nox@$USER
-wget -O /root/BBRy.sh https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/refs/heads/main/BBR/BBRx/BBRy.sh
-chmod +x /root/BBRy.sh
-bash /root/BBRy.sh
-#systemctl disable qbittorrent-nox@$USER
+
+case "$BBR_OPTION" in
+    bbrx)
+        echo "启用 BBRx..."
+        wget -O /root/BBRx.sh https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/refs/heads/main/BBR/BBRx/BBRx.sh
+        chmod +x /root/BBRx.sh
+        bash /root/BBRx.sh
+        ;;
+    bbry)
+        echo "启用 BBRy..."
+        wget -O /root/BBRy.sh https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/refs/heads/main/BBR/BBRx/BBRy.sh
+        chmod +x /root/BBRy.sh
+        bash /root/BBRy.sh
+        ;;
+    bbrz)
+        echo "启用 BBRz..."
+        wget -O /root/BBRz.sh https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/refs/heads/main/BBR/BBRx/BBRz.sh
+        chmod +x /root/BBRz.sh
+        bash /root/BBRz.sh
+        ;;
+    none)
+        echo "不启用任何 BBR 加速"
+        ;;
+    *)
+        echo "无效选项: $BBR_OPTION"
+        exit 1
+        ;;
+esac
+
 systemARCH=$(uname -m)
 if [[ $systemARCH == x86_64 ]]; then
-    wget -O /usr/bin/qbittorrent-nox https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/refs/heads/main/Torrent%20Clients/qBittorrent/x86_64/qBittorrent-5.0.4%20-%20libtorrent-v1.2.20/qbittorrent-nox
+    wget -O /usr/bin/qbittorrent-nox "https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/refs/heads/main/Torrent%20Clients/qBittorrent/x86_64/qBittorrent-5.0.4%20-%20libtorrent-v1.2.20/qbittorrent-nox"
 elif [[ $systemARCH == aarch64 ]]; then
-    wget -O /usr/bin/qbittorrent-nox https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/refs/heads/main/Torrent%20Clients/qBittorrent/ARM64/qBittorrent-5.0.4%20-%20libtorrent-v1.2.20/qbittorrent-nox
+    wget -O /usr/bin/qbittorrent-nox "https://raw.githubusercontent.com/RinehartZ/Seedbox-Components/refs/heads/main/Torrent%20Clients/qBittorrent/ARM64/qBittorrent-5.0.4%20-%20libtorrent-v1.2.20/qbittorrent-nox"
 fi
 chmod +x /usr/bin/qbittorrent-nox
-sed -i "s/WebUI\\\\Port=[0-9]*/WebUI\\\\Port=$PORT/" /home/$USER/.config/qBittorrent/qBittorrent.conf
-sed -i "s/Connection\\\\PortRangeMin=[0-9]*/Connection\\\\PortRangeMin=$UP_PORT/" /home/$USER/.config/qBittorrent/qBittorrent.conf
-sed -i "/\\[Preferences\\]/a General\\\\Locale=zh" /home/$USER/.config/qBittorrent/qBittorrent.conf
-sed -i "/\\[Preferences\\]/a Downloads\\\\PreAllocation=false" /home/$USER/.config/qBittorrent/qBittorrent.conf
-sed -i "/\\[Preferences\\]/a WebUI\\\\CSRFProtection=false" /home/$USER/.config/qBittorrent/qBittorrent.conf
-sed -i "s/disable_tso_/# disable_tso_/" /root/.boot-script.sh
+
+CONFIG_FILE="/home/$USER/.config/qBittorrent/qBittorrent.conf"
+sed -i "s/WebUI\\\\Port=[0-9]*/WebUI\\\\Port=$PORT/" $CONFIG_FILE
+sed -i "s/Connection\\\\PortRangeMin=[0-9]*/Connection\\\\PortRangeMin=$UP_PORT/" $CONFIG_FILE
+sed -i "/\\[Preferences\\]/a General\\\\Locale=zh" $CONFIG_FILE
+sed -i "/\\[Preferences\\]/a Downloads\\\\PreAllocation=false" $CONFIG_FILE
+sed -i "/\\[Preferences\\]/a WebUI\\\\CSRFProtection=false" $CONFIG_FILE
+
+tune2fs -m 1 $(df / | awk 'NR==2 {print $1}')
+
 systemctl enable qbittorrent-nox@$USER
 systemctl start qbittorrent-nox@$USER
-echo "shutdown -r +1" >> /root/BBRy.sh
-tune2fs -m 1 $(df -h / | awk 'NR==2 {print $1}') 
-echo "安装完成，系统将在 1 分钟后重启以应用 BBRy TCP 加速..."
+
+echo "安装完成，系统将在 1 分钟后重启以应用 TCP 加速..."
 shutdown -r +1
