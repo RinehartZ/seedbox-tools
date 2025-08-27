@@ -1,6 +1,6 @@
 # Usage
 ```bash
-bash <(wget -qO- https://raw.githubusercontent.com/RinehartZ/seedbox-tools/refs/heads/main/Tools/install.sh) <user> <password> <port> <qb_up_port> <bbr_option>
+bash <(wget -qO- https://raw.githubusercontent.com/RinehartZ/seedbox-tools/refs/heads/main/Tools/QB504Install.sh) <user> <password> <port> <qb_up_port> <bbr_option>
 ```
 # 参数说明
 user: 用户名（必需）
