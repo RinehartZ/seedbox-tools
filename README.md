@@ -20,3 +20,10 @@ bbry: 启用 BBRy 加速
 bbrz: 启用 BBRz 加速
 
 none: 不启用加速
+
+## 致谢
+
+本工具基于以下开源项目构建和改进：
+- 主要参考: [iniwex5/tools](https://github.com/iniwex5/tools)
+- Seedbox 基础: [jerry048/Dedicated-Seedbox](https://github.com/jerry048/Dedicated-Seedbox)
+- BBR 加速组件: [guowanghushifu/Seedbox-Components](https://github.com/guowanghushifu/Seedbox-Components)
