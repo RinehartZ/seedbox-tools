@@ -1,8 +1,13 @@
-# Usage
+# 用法
 ```bash
 bash <(wget -qO- https://raw.githubusercontent.com/RinehartZ/seedbox-tools/refs/heads/main/Tools/QB504Install.sh) <user> <password> <port> <qb_up_port> <bbr_option>
 ```
+# 支持平台
+```bash
+Debian12
+```
 # 参数说明
+```bash
 user: 用户名（必需）
 
 password: 密码（必需）
@@ -20,7 +25,7 @@ bbry: 启用 BBRy 加速
 bbrz: 启用 BBRz 加速
 
 none: 不启用加速
-
+```
 ## 致谢
 
 本工具基于以下开源项目构建和改进：
