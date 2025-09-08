@@ -60,6 +60,10 @@ for instance in "${!INSTANCES[@]}"; do
     # 复制文件
     cp "$SOURCE_FILE" "$TARGET_FILE"
     
+    # 修正服务为 Type=exec 并去除 ExecStart 中的 -d
+    sed -i 's/^[[:space:]]*Type=forking[[:space:]]*$/Type=exec/' "$TARGET_FILE"
+    sed -i 's/\(ExecStart=.*qbittorrent-nox\) -d/\1/' "$TARGET_FILE"
+
     # 修改目标文件内容
     sed -i "s/Description=qBittorrent/Description= ${instance}/" "$TARGET_FILE"
     sed -i "s#\(ExecStart=/usr/bin/qbittorrent-nox\).*#\1 --profile=\/home\/${USERNAME}\/${instance} --confirm-legal-notice#" "$TARGET_FILE"
