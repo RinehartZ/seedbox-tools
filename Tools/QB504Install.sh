@@ -87,8 +87,8 @@ sed -i "/\\[Preferences\\]/a WebUI\\\\CSRFProtection=false" $CONFIG_FILE
 
 tune2fs -m 1 $(df / | awk 'NR==2 {print $1}')
 
-systemctl enable qbittorrent-nox@$USER
-systemctl start qbittorrent-nox@$USER
+systemctl enable seedbox-qbittorrent-nox@$USER
+systemctl start seedbox-qbittorrent-nox@$USER
 
 echo "安装完成，系统将在 1 分钟后重启以应用 TCP 加速..."
 shutdown -r +1
