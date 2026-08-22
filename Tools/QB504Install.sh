@@ -23,7 +23,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/jerry048/Dedicated-Seedbox/ma
 apt update
 apt install -y curl htop vnstat
 
-systemctl stop qbittorrent-nox@$USER
+systemctl stop seedbox-qbittorrent-@$USER
 
 # BBR 部分保持不变
 case "$BBR_OPTION" in
@@ -87,8 +87,8 @@ sed -i "/\\[Preferences\\]/a WebUI\\\\CSRFProtection=false" $CONFIG_FILE
 
 tune2fs -m 1 $(df / | awk 'NR==2 {print $1}')
 
-systemctl enable seedbox-qbittorrent-nox@$USER
-systemctl start seedbox-qbittorrent-nox@$USER
+systemctl enable seedbox-qbittorrent-@$USER
+systemctl start seedbox-qbittorrent-@$USER
 
 echo "安装完成，系统将在 1 分钟后重启以应用 TCP 加速..."
 shutdown -r +1
