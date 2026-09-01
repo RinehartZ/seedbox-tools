@@ -27,7 +27,7 @@ START_WEB_PORT=${START_WEB_PORT:-$DEFAULT_WEB_PORT}
 START_BT_PORT=${START_BT_PORT:-$DEFAULT_BT_PORT}
 
 # 源文件和目标文件路径
-SOURCE_FILE="/etc/systemd/system/qbittorrent-nox@.service"
+SOURCE_FILE="/etc/systemd/system/seedbox-qbittorrent-*.service"
 
 # 检查源文件是否存在
 if [ ! -f "$SOURCE_FILE" ]; then
@@ -74,10 +74,10 @@ for instance in "${!INSTANCES[@]}"; do
     
     echo "已创建服务：${instance}"
 done
-# 停止qbittorrent-nox@.service服务
-echo "正在停止qbittorrent-nox@${USERNAME}.service服务..."
-systemctl stop qbittorrent-nox@${USERNAME}.service
-systemctl disable qbittorrent-nox@${USERNAME}.service
+# 停止原始 seedbox qBittorrent 服务
+echo "正在停止 seedbox-qbittorrent-${USERNAME}.service 服务..."
+systemctl stop "seedbox-qbittorrent-${USERNAME}.service"
+systemctl disable "seedbox-qbittorrent-${USERNAME}.service"
 # 重新加载 systemd 配置
 systemctl daemon-reload
 
@@ -170,10 +170,10 @@ for instance in "${!INSTANCES[@]}"; do
     fi
 done
 
-# 启动原始 qBittorrent 服务
+# 启动原始 seedbox qBittorrent 服务
 echo "启动原始 qBittorrent 服务..."
-systemctl start qbittorrent-nox@${USERNAME}.service
-systemctl enable qbittorrent-nox@${USERNAME}.service
+systemctl start "seedbox-qbittorrent-${USERNAME}.service"
+systemctl enable "seedbox-qbittorrent-${USERNAME}.service"
 
 # 启用并启动所有创建的服务
 echo "启用所有创建的qBittorrent服务..."
