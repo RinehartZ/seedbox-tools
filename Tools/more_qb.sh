@@ -27,7 +27,7 @@ START_WEB_PORT=${START_WEB_PORT:-$DEFAULT_WEB_PORT}
 START_BT_PORT=${START_BT_PORT:-$DEFAULT_BT_PORT}
 
 # 源文件和目标文件路径
-SOURCE_FILE="/etc/systemd/system/seedbox-qbittorrent-.service"
+SOURCE_FILE=$(find /etc/systemd/system -maxdepth 1 -type f -name 'seedbox-qbittorrent-*.service' | head -n 1)
 
 # 检查源文件是否存在
 if [ ! -f "$SOURCE_FILE" ]; then
