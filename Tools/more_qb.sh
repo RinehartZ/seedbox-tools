@@ -66,7 +66,8 @@ for instance in "${!INSTANCES[@]}"; do
 
     # 修改目标文件内容
     sed -i "s/Description=qBittorrent/Description= ${instance}/" "$TARGET_FILE"
-    sed -i "s#\(ExecStart=/usr/bin/qbittorrent-nox\).*#\1 --profile=\/home\/${USERNAME}\/${instance} --confirm-legal-notice#" "$TARGET_FILE"
+    EXEC_START=$(grep '^ExecStart=' "$SOURCE_FILE")
+    sed -i "s#^ExecStart=.*#${EXEC_START} --profile=/home/${USERNAME}/${instance} --confirm-legal-notice#" "$TARGET_FILE"
     
     # 创建配置目录
     mkdir -p "/home/${USERNAME}/${instance}"
