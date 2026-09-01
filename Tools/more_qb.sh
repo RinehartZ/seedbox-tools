@@ -57,22 +57,29 @@ for instance in "${!INSTANCES[@]}"; do
     TARGET_FILE="/etc/systemd/system/${instance}.service"
     IFS=':' read -r web_port bt_port ssl_port <<< "${INSTANCES[$instance]}"
     
-    # 复制文件
+    # 复制原始服务文件
     cp "$SOURCE_FILE" "$TARGET_FILE"
-    
-    # 修正服务为 Type=exec 并去除 ExecStart 中的 -d
-    sed -i 's/^[[:space:]]*Type=forking[[:space:]]*$/Type=exec/' "$TARGET_FILE"
-    sed -i 's/\(ExecStart=.*qbittorrent-nox\) -d/\1/' "$TARGET_FILE"
 
-    # 修改目标文件内容
-    sed -i "s/Description=qBittorrent/Description= ${instance}/" "$TARGET_FILE"
+    # 修改服务类型
+    sed -i 's/^[[:space:]]*Type=forking[[:space:]]*$/Type=exec/' "$TARGET_FILE"
+
+    # 修改 Description
+    sed -i "s/^Description=.*/Description=Seedbox qBittorrent-nox instance for ${instance}/" "$TARGET_FILE"
+
+    # 从原始服务文件动态获取 ExecStart
     EXEC_START=$(grep '^ExecStart=' "$SOURCE_FILE")
+    if [ -z "$EXEC_START" ]; then
+        echo "错误：无法从 $SOURCE_FILE 获取 ExecStart"
+        exit 1
+    fi
+
+    # 添加独立 profile
     sed -i "s#^ExecStart=.*#${EXEC_START} --profile=/home/${USERNAME}/${instance} --confirm-legal-notice#" "$TARGET_FILE"
-    
-    # 创建配置目录
+
+    # 创建实例目录
     mkdir -p "/home/${USERNAME}/${instance}"
     chown "${USERNAME}:${USERNAME}" "/home/${USERNAME}/${instance}"
-    
+
     echo "已创建服务：${instance}"
 done
 # 停止原始 seedbox qBittorrent 服务
